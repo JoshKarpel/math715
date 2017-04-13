@@ -1,10 +1,7 @@
 __author__ = 'Josh Karpel'
 
-import datetime as dt
-import functools
-import multiprocessing as mp
+import functools as ft
 import os
-from copy import deepcopy
 
 import matplotlib as mpl
 
@@ -14,8 +11,6 @@ mpl_rcParams_update = {
     'font.family': 'serif',
     'mathtext.fontset': 'cm',
     'mathtext.rm': 'serif',
-    'xtick.top': True,
-    'ytick.right': True,
 }
 
 mpl.rcParams.update(mpl_rcParams_update)
@@ -24,8 +19,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 np.set_printoptions(precision = 3, linewidth = 200)
-
-plt.set_cmap(plt.cm.inferno)
 
 
 def ensure_dir_exists(path):
@@ -47,17 +40,6 @@ def save_current_figure(name = 'img', target_dir = None, img_format = 'pdf', sca
     ensure_dir_exists(path)
 
     plt.savefig(path, dpi = scale_factor * plt.gcf().dpi, bbox_inches = 'tight')
-
-
-def multi_map(function, targets, processes = None):
-    """Map a function over a list of inputs using multiprocessing."""
-    if processes is None:
-        processes = mp.cpu_count() - 1
-
-    with mp.Pool(processes = processes) as pool:
-        output = pool.map(function, targets)
-
-    return output
 
 
 def figsize(scale, fig_width_pts = 498.66258, aspect_ratio = (np.sqrt(5.0) - 1.0) / 2.0):
@@ -98,3 +80,22 @@ def get_figure(scale = 0.9, fig_width_pts = 498.66258, aspect_ratio = (np.sqrt(5
     fig = plt.figure(figsize = figsize(scale, fig_width_pts = fig_width_pts, aspect_ratio = aspect_ratio))
 
     return fig
+
+
+def hash_args_kwargs(*args, **kwargs):
+    """Return the hash of a tuple containing the args and kwargs."""
+    return hash(args + tuple(kwargs.items()))
+
+
+def memoize(func):
+    """Memoize a function by storing a dictionary of {inputs: outputs}."""
+    memo = {}
+
+    @ft.wraps(func)
+    def memoizer(*args, **kwargs):
+        key = hash_args_kwargs(*args, **kwargs)
+        if key not in memo:
+            memo[key] = func(*args, **kwargs)
+        return memo[key]
+
+    return memoizer
