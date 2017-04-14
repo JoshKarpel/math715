@@ -1,7 +1,8 @@
 __author__ = 'Josh Karpel'
 
-import functools as ft
 import os
+import functools as ft
+import multiprocessing as mp
 
 import matplotlib as mpl
 
