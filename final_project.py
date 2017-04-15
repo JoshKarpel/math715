@@ -1,6 +1,9 @@
 __author__ = 'Josh Karpel'
 
-from utils import *
+import os
+import collections
+
+import utils
 
 import numpy as np
 import numpy.ma as ma
@@ -68,7 +71,6 @@ class BSplineBasis:
     def xi(self):
         return np.linspace(self.xi_min, self.xi_max, self.parameter_space_points)
 
-    @memoize
     def basis_null(self, basis_function_index):
         """Return the zero-order basis function evaluated along the parameter space for a given basis function index."""
         if basis_function_index == self.basis_function_indices[-1]:
@@ -79,7 +81,6 @@ class BSplineBasis:
         return np.where(np.greater_equal(self.xi, self.knot_vector[basis_function_index]) * comp(self.xi, self.knot_vector[basis_function_index + 1]),
                         1.0, 0.0)
 
-    @memoize
     def basis_function(self, basis_function_index, polynomial_order):
         """Return the p = polynomial_order basis function evaluated along the parameter space for a given basis function index."""
         if polynomial_order == 0:  # base case
@@ -103,8 +104,8 @@ class BSplineBasis:
     def __iter__(self):
         yield from (self.basis_function(basis_index, self.polynomial_order) for basis_index in self.basis_function_indices)
 
-    def plot_basis_functions(self, **kwargs):
-        fig = get_figure('full')
+    def plot_basis_functions(self, fig_scale = 'full', **kwargs):
+        fig = utils.get_figure(fig_scale)
         ax = fig.add_subplot(111)
 
         for basis_index in self.basis_function_indices:
@@ -118,13 +119,16 @@ class BSplineBasis:
 
         ax.set_xlabel(r'$\xi$', fontsize = 12)
         ax.set_ylabel(r'$N_{i,p}(\xi)$', fontsize = 12)
-        ax.set_title(fr'Basis Functions for $\Xi = \left[ {",".join(str(s) for s in self.knot_vector)} \right]$, $p = {self.polynomial_order}$')
 
-        ax.legend(bbox_to_anchor = (1.02, 1), loc = 'upper left', borderaxespad = 0., fontsize = 12, ncol = 1 + (len(self.basis_function_indices) // 15))
+        if kwargs.get('img_format') != 'pgf':
+            ax.set_title(fr'Basis Functions for $\Xi = \left[ {",".join(str(s) for s in self.knot_vector)} \right]$, $p = {self.polynomial_order}$')
+            ax.legend(bbox_to_anchor = (1.02, 1), loc = 'upper left', borderaxespad = 0., fontsize = 12, ncol = 1 + (len(self.basis_function_indices) // 15))
+        else:
+            ax.legend(loc = 'best', handlelength = 1)
 
         ax.grid(True, **GRID_KWARGS)
 
-        save_current_figure(name = self.name + '__basis', **kwargs)
+        utils.save_current_figure(name = self.name + '__basis', **kwargs)
 
         plt.close()
 
@@ -157,9 +161,9 @@ class BSplineCurve:
         """Return the d-dimensional curve given by the control points and basis functions."""
         return sum(np.outer(basis_function, control_point) for basis_function, control_point in zip(self.basis, self.control_points)).T
 
-    def plot_curve_2D(self, **kwargs):
+    def plot_curve_2D(self, fig_scale = 'full', **kwargs):
         """Only works in 2D..."""
-        fig = get_figure('full')
+        fig = utils.get_figure(fig_scale)
         ax = fig.add_subplot(111)
 
         curve_x, curve_y = self.curve()
@@ -183,13 +187,13 @@ class BSplineCurve:
 
         ax.axis('off')
 
-        save_current_figure(**kwargs)
+        utils.save_current_figure(**kwargs)
 
         plt.close()
 
     def plot_curve_3D(self, length = 30, fps = 30, **kwargs):
         """Only works in 3D..."""
-        fig = get_figure(scale = 3)
+        fig = utils.get_figure(scale = 3)
         ax = fig.add_subplot(111, projection = '3d')
 
         curve_x, curve_y, curve_z = self.curve()
@@ -266,9 +270,11 @@ if __name__ == '__main__':
     bsplines = (
         BSplineBasis(knot_vector = [0, 1, 2, 3, 4, 5], polynomial_order = 0),
         BSplineBasis(knot_vector = [0, 1, 2, 3, 4, 5], polynomial_order = 1),
-        BSplineBasis(knot_vector = [0, 0, 1, 2, 3, 4, 5, 5], polynomial_order = 1),
         BSplineBasis(knot_vector = [0, 1, 2, 3, 4, 5], polynomial_order = 2),
+        BSplineBasis(knot_vector = [0, 1, 2, 3, 4, 5], polynomial_order = 3),
+        BSplineBasis(knot_vector = [0, 1, 2, 3, 4, 5], polynomial_order = 4),
         BSplineBasis(knot_vector = [0, 0, 1, 2, 3, 4, 5], polynomial_order = 2),
+        BSplineBasis(knot_vector = [0, 0, 1, 2, 3, 4, 5, 5], polynomial_order = 1),
         BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5], polynomial_order = 2),
         BSplineBasis(knot_vector = [0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 6, 7, 7, 8, 8, 9, 9, 9], polynomial_order = 3),
         BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 2, 3, 3, 4, 5, 5, 6, 7, 7, 8, 8, 9, 9, 9], polynomial_order = 4),
@@ -276,6 +282,7 @@ if __name__ == '__main__':
     for bspline in bsplines:
         print(bspline.info())
         bspline.plot_basis_functions(**plt_kwargs)
+        bspline.plot_basis_functions(**plt_kwargs, img_format = 'pgf', fig_scale = 'half')
         print('-' * 80)
 
     ## CURVE FROM HUGHES ET. AL. 2004 ##
@@ -290,6 +297,7 @@ if __name__ == '__main__':
         (3.5, 0),
     ])
     paper_curve.plot_curve_2D(name = 'paper_curve', **plt_kwargs)
+    paper_curve.plot_curve_2D(name = 'paper_curve', **plt_kwargs, img_format = 'pgf', fig_scale = 'full')
 
     ## 3D VERSION OF PAPER CURVE ##
     fancy_curve = BSplineCurve(BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5], polynomial_order = 2), [

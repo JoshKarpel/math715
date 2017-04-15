@@ -4,20 +4,60 @@ import os
 import functools as ft
 import multiprocessing as mp
 
+import numpy as np
 import matplotlib as mpl
 
 mpl.use('Agg')
 
-mpl_rcParams_update = {
-    'font.family': 'serif',
-    'mathtext.fontset': 'cm',
-    'mathtext.rm': 'serif',
-}
 
-mpl.rcParams.update(mpl_rcParams_update)
+#
+# mpl_rcParams_update = {
+#     'font.family': 'serif',
+#     'mathtext.fontset': 'cm',
+#     'mathtext.rm': 'serif',
+# }
+
+def figsize(scale, fig_width_pts = 498.66258, aspect_ratio = (np.sqrt(5.0) - 1.0) / 2.0):
+    """
+    Helper function for get_figure
+
+    :param scale:
+    :param fig_width_pts: get this from LaTeX using \the\textwidth
+    :param aspect_ratio: height = width * ratio, defaults to golden ratio
+    :return:
+    """
+    inches_per_pt = 1.0 / 72.27  # Convert pt to inch
+
+    fig_width = fig_width_pts * inches_per_pt * scale  # width in inches
+    fig_height = fig_width * aspect_ratio  # height in inches
+    fig_size = [fig_width, fig_height]
+
+    return fig_size
+
+
+pgf_with_latex = {  # setup matplotlib to use latex for output
+    "pgf.texsystem": "pdflatex",  # change this if using xetex or lautex
+    "text.usetex": True,  # use LaTeX to write all text
+    "font.family": "serif",
+    "font.serif": [],  # blank entries should cause plots to inherit fonts from the document
+    "font.sans-serif": [],
+    "font.monospace": [],
+    "axes.labelsize": 11,  # LaTeX default is 10pt font.
+    "font.size": 11,
+    "legend.fontsize": 10,  # Make the legend/label fonts a little smaller
+    "xtick.labelsize": 9,
+    "ytick.labelsize": 9,
+    "figure.figsize": figsize(.95),  # default fig size of 0.95 \textwidth
+    "pgf.preamble": [
+        r"\usepackage[utf8x]{inputenc}",  # use utf8 fonts because your computer can handle it :)
+        r"\usepackage[T1]{fontenc}",  # plots will be generated using this preamble
+    ]
+}
+mpl.rcParams.update(pgf_with_latex)
+
+# mpl.rcParams.update(mpl_rcParams_update)
 
 import matplotlib.pyplot as plt
-import numpy as np
 
 np.set_printoptions(precision = 3, linewidth = 200)
 
@@ -32,7 +72,7 @@ def ensure_dir_exists(path):
     os.makedirs(make_path, exist_ok = True)
 
 
-def save_current_figure(name = 'img', target_dir = None, img_format = 'pdf', scale_factor = 1):
+def save_current_figure(name = 'img', target_dir = None, img_format = 'pdf', scale_factor = 1, **kwargs):
     """Save the current matplotlib figure with the given name to the given folder."""
     if target_dir is None:
         target_dir = os.getcwd()
