@@ -242,6 +242,17 @@ class BSplineCurve:
         plt.close()
 
 
+class NURBSCurve(BSplineCurve):
+    def __init__(self, basis, control_points, weights):
+        super().__init__(basis, control_points)
+        self.weights = np.array(weights)
+
+    def curve(self):
+        """Return the d-dimensional curve given by the (weighted) control points and basis functions."""
+        return (sum(np.outer(basis_function * weight, control_point) for basis_function, control_point, weight in zip(self.basis, self.control_points, self.weights)).T /
+                sum(basis_function * weight for basis_function, weight in zip(self.basis, self.weights)).T)
+
+
 def random_curve(number_of_unique_knots, polynomial_order = 2, dimensions = 3):
     """Return a BSplineCurve in some number of dimensions and polynomial order, generated from a random sample of knots and control points."""
     knot_multiplicites = rand.randint(1, polynomial_order + 1, size = number_of_unique_knots)
@@ -299,6 +310,20 @@ if __name__ == '__main__':
     paper_curve.plot_curve_2D(name = 'paper_curve', **plt_kwargs)
     paper_curve.plot_curve_2D(name = 'paper_curve', **plt_kwargs, img_format = 'pgf', fig_scale = 'full')
 
+    ## NURBS CURVE modification ##
+    nurbs_curve = NURBSCurve(BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5], polynomial_order = 2), [
+        (0, 0),
+        (0, 1),
+        (1, -1),
+        (1, .5),
+        (2, .5),
+        (2.5, -1),
+        (3, 0),
+        (3.5, 0),
+    ], weights = [1, 2, 1, 3, .5, 1, 1, 1])
+    nurbs_curve.plot_curve_2D(name = 'nurbs_curve', **plt_kwargs)
+    nurbs_curve.plot_curve_2D(name = 'nurbs_curve', **plt_kwargs, img_format = 'pgf', fig_scale = 'full')
+
     ## 3D VERSION OF PAPER CURVE ##
     fancy_curve = BSplineCurve(BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5], polynomial_order = 2), [
         (0, 0, 0),
@@ -312,7 +337,7 @@ if __name__ == '__main__':
     ])
     fancy_curve.plot_curve_3D(name = 'fancy_curve', **plt_kwargs)
 
-    ## RANDOM CURVES ##
+    # RANDOM CURVES ##
     uk_p_d = (
         (6, 2, 2),
         (8, 3, 2),
