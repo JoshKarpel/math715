@@ -1,7 +1,4 @@
-__author__ = 'Josh Karpel'
-
 import os
-import collections
 
 import utils
 
@@ -42,7 +39,7 @@ class BSplineBasis:
             f'  Polynomial Order: {self.polynomial_order}',
             f'  Number of Knots: {self.number_of_knots}',
             f'  Number of Unique Knots: {self.number_of_unique_knots}',
-            f'  # of Basis Functions + Polynomial Order + 1: {len(self.basis_function_indices) + bspline.polynomial_order + 1}',
+            f'  # of Basis Functions + Polynomial Order + 1: {len(self.basis_function_indices) + self.polynomial_order + 1}',
         ]
 
         return '\n'.join(out)
@@ -71,6 +68,7 @@ class BSplineBasis:
     def xi(self):
         return np.linspace(self.xi_min, self.xi_max, self.parameter_space_points)
 
+    @utils.memoize
     def basis_null(self, basis_function_index):
         """Return the zero-order basis function evaluated along the parameter space for a given basis function index."""
         if basis_function_index == self.basis_function_indices[-1]:
@@ -81,6 +79,7 @@ class BSplineBasis:
         return np.where(np.greater_equal(self.xi, self.knot_vector[basis_function_index]) * comp(self.xi, self.knot_vector[basis_function_index + 1]),
                         1.0, 0.0)
 
+    @utils.memoize
     def basis_function(self, basis_function_index, polynomial_order):
         """Return the p = polynomial_order basis function evaluated along the parameter space for a given basis function index."""
         if polynomial_order == 0:  # base case
@@ -104,7 +103,7 @@ class BSplineBasis:
     def __iter__(self):
         yield from (self.basis_function(basis_index, self.polynomial_order) for basis_index in self.basis_function_indices)
 
-    def plot_basis_functions(self, fig_scale = 'full', **kwargs):
+    def plot_basis_functions(self, fig_scale = 'full', title = True, legend_on_right = True, **kwargs):
         fig = utils.get_figure(fig_scale)
         ax = fig.add_subplot(111)
 
@@ -120,11 +119,13 @@ class BSplineBasis:
         ax.set_xlabel(r'$\xi$', fontsize = 12)
         ax.set_ylabel(r'$N_{i,p}(\xi)$', fontsize = 12)
 
-        if kwargs.get('img_format') != 'pgf':
+        if title:
             ax.set_title(fr'Basis Functions for $\Xi = \left[ {",".join(str(s) for s in self.knot_vector)} \right]$, $p = {self.polynomial_order}$')
-            ax.legend(bbox_to_anchor = (1.02, 1), loc = 'upper left', borderaxespad = 0., fontsize = 12, ncol = 1 + (len(self.basis_function_indices) // 15))
+
+        if legend_on_right:
+            ax.legend(bbox_to_anchor = (1.02, 1), loc = 'upper left', borderaxespad = 0., fontsize = 12, handlelength = 1, ncol = 1 + (len(self.basis_function_indices) // 15))
         else:
-            ax.legend(loc = 'best', handlelength = 1)
+            ax.legend(loc = 'upper right', handlelength = 1)
 
         ax.grid(True, **GRID_KWARGS)
 
@@ -272,6 +273,85 @@ def random_curve(number_of_unique_knots, polynomial_order = 2, dimensions = 3):
     return curve
 
 
+class BSplineSurface:
+    def __init__(self, basis_1, basis_2, control_net):
+        self.basis_1 = basis_1
+        self.basis_2 = basis_2
+        self.control_net = control_net
+
+        self.xi_1_mesh, self.xi_2_mesh = np.meshgrid(self.basis_1.xi, self.basis_2.xi, indexing = 'ij')
+
+    def surface(self):
+        """Return the d-dimensional surface given by the control points and basis functions."""
+        # return sum(np.outer(basis_function, control_point) for basis_function, control_point in zip(self.basis_1, self.basis)).T
+        return sum(np.outer(basis_function_1, self.control_net[ii, jj]) for ((ii, basis_function_1), (jj, basis_function_2)) in zip(enumerate(self.basis_1), enumerate(self.basis_2))).T
+        # return sum(np.outer(basis_function_1, self.control_net[ii, jj]) + np.outer(basis_function_2, self.control_net[ii, jj]) for ((ii, basis_function_1), (jj, basis_function_2)) in zip(enumerate(self.basis_1), enumerate(self.basis_2))).T
+
+    def plot_surface_3D(self, length = 30, fps = 30, **kwargs):
+        """Only works in 3D..."""
+        fig = utils.get_figure(scale = 3)
+        ax = fig.add_subplot(111, projection = '3d')
+
+        # surface_x = self.xi_1_mesh
+        # surface_y = self.xi_2_mesh
+        surface_x, surface_y, surface_z = self.surface()
+
+        # surface_x, surface_y = np.meshgrid(surface_x, surface_y)
+
+        print(np.shape(surface_x))
+        print(np.shape(surface_y))
+        print(np.shape(surface_z))
+
+        control_points_x = np.array([control_point[0] for control_point in self.control_net.values()])
+        control_points_y = np.array([control_point[1] for control_point in self.control_net.values()])
+        control_points_z = np.array([control_point[2] for control_point in self.control_net.values()])
+
+        x_min = min(np.min(surface_x), np.min(control_points_x))
+        x_max = max(np.max(surface_x), np.max(control_points_x))
+        x_range = np.abs(x_max - x_min)
+
+        y_min = min(np.min(surface_y), np.min(control_points_y))
+        y_max = max(np.max(surface_y), np.max(control_points_y))
+        y_range = np.abs(y_max - y_min)
+
+        z_min = min(np.min(surface_z), np.min(control_points_z))
+        z_max = max(np.max(surface_z), np.max(control_points_z))
+        z_range = np.abs(z_max - z_min)
+
+        ax.set_xlim(x_min - 0.05 * x_range, x_max + 0.05 * x_range)
+        ax.set_ylim(y_min - 0.05 * y_range, y_max + 0.05 * y_range)
+        ax.set_zlim(z_min - 0.05 * z_range, z_max + 0.05 * z_range)
+
+        ax.plot(control_points_x, control_points_y, control_points_z, **CONTROL_POLYGON_KWARGS)
+
+        print(np.max(surface_x), np.max(surface_y), np.max(surface_z))
+        print(np.min(surface_x), np.min(surface_y), np.min(surface_z))
+        ax.plot_trisurf(surface_x, surface_y, surface_z)
+        # ax.plot_trisurf(surface_x, surface_y, surface_z, **CURVE_KWARGS)
+
+        ax.axis('off')
+
+        ax.view_init(elev = 45, azim = 0)  # note that this resets ax.dist to 10, so we can't use it below
+        ax.dist = 7.5  # default is 10, so zoom in a little because there's no axis to take up the rest of the space
+
+        utils.save_current_figure(**kwargs)
+
+        ### ANIMATION ###
+
+        frames = length * fps
+
+        writer = anim.writers['ffmpeg'](fps = fps, bitrate = 2000)  # don't need a very high bitrate
+
+        def animate(frame):
+            print(frame, frames, frame / frames)
+            ax.azim = 360 * frame / frames  # one full rotation
+            return []  # must return the list of artists we modified (i.e., nothing, since all we did is rotate the view)
+
+        ani = anim.FuncAnimation(fig, animate, frames = frames, blit = True)
+        ani.save(f"{os.path.join(kwargs['target_dir'], kwargs['name'])}.mp4", writer = writer)
+
+        plt.close()
+
 if __name__ == '__main__':
     plt_kwargs = dict(
         target_dir = OUT_DIR,
@@ -286,15 +366,19 @@ if __name__ == '__main__':
         BSplineBasis(knot_vector = [0, 1, 2, 3, 4, 5], polynomial_order = 4),
         BSplineBasis(knot_vector = [0, 0, 1, 2, 3, 4, 5], polynomial_order = 2),
         BSplineBasis(knot_vector = [0, 0, 1, 2, 3, 4, 5, 5], polynomial_order = 1),
-        BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5], polynomial_order = 2),
-        BSplineBasis(knot_vector = [0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 6, 7, 7, 8, 8, 9, 9, 9], polynomial_order = 3),
-        BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 2, 3, 3, 4, 5, 5, 6, 7, 7, 8, 8, 9, 9, 9], polynomial_order = 4),
+        # BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5], polynomial_order = 2),
+        # BSplineBasis(knot_vector = [0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 6, 7, 7, 8, 8, 9, 9, 9], polynomial_order = 3),
+        # BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 2, 3, 3, 4, 5, 5, 6, 7, 7, 8, 8, 9, 9, 9], polynomial_order = 4),
     )
     for bspline in bsplines:
         print(bspline.info())
         bspline.plot_basis_functions(**plt_kwargs)
-        bspline.plot_basis_functions(**plt_kwargs, img_format = 'pgf', fig_scale = 'half')
+        bspline.plot_basis_functions(**plt_kwargs, img_format = 'pgf', fig_scale = 'half', title = False, legend_on_right = False)
         print('-' * 80)
+
+    paper_spline = BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5], polynomial_order = 2)
+    paper_spline.plot_basis_functions(**plt_kwargs)
+    paper_spline.plot_basis_functions(**plt_kwargs, img_format = 'pgf', fig_scale = 'full', title = False, legend_on_right = True)
 
     ## CURVE FROM HUGHES ET. AL. 2004 ##
     paper_curve = BSplineCurve(BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5], polynomial_order = 2), [
@@ -308,9 +392,9 @@ if __name__ == '__main__':
         (3.5, 0),
     ])
     paper_curve.plot_curve_2D(name = 'paper_curve', **plt_kwargs)
-    paper_curve.plot_curve_2D(name = 'paper_curve', **plt_kwargs, img_format = 'pgf', fig_scale = 'full')
+    paper_curve.plot_curve_2D(name = 'paper_curve', **plt_kwargs, img_format = 'pgf', fig_scale = 'full', title = False, legend_on_right = True)
 
-    ## NURBS CURVE modification ##
+    ## NURBS CURVE ##
     nurbs_curve = NURBSCurve(BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5], polynomial_order = 2), [
         (0, 0),
         (0, 1),
@@ -320,7 +404,7 @@ if __name__ == '__main__':
         (2.5, -1),
         (3, 0),
         (3.5, 0),
-    ], weights = [1, 2, 1, 3, .5, 1, 1, 1])
+        ], weights = [1, 2, 1, 3, .5, 1, 1, 1])
     nurbs_curve.plot_curve_2D(name = 'nurbs_curve', **plt_kwargs)
     nurbs_curve.plot_curve_2D(name = 'nurbs_curve', **plt_kwargs, img_format = 'pgf', fig_scale = 'full')
 
@@ -337,7 +421,7 @@ if __name__ == '__main__':
     ])
     fancy_curve.plot_curve_3D(name = 'fancy_curve', **plt_kwargs)
 
-    # RANDOM CURVES ##
+    ## RANDOM CURVES ##
     uk_p_d = (
         (6, 2, 2),
         (8, 3, 2),
@@ -350,12 +434,34 @@ if __name__ == '__main__':
             print(rc.info())
             print('-' * 80)
 
-            name = f'rc_uk={uk}_p={p}_d={d}__{ii}'
+            name = f'rc_uk={uk}_p={p}_d={d}__{ii}__' + rc.basis.name
 
             with open(os.path.join(OUT_DIR, f'{name}.txt'), mode = 'w') as f:
                 f.write(rc.info())
+
+            rc.basis.plot_basis_functions(**plt_kwargs)
+            rc.basis.plot_basis_functions(**plt_kwargs, img_format = 'pgf', fig_scale = 'half', title = False, legend_on_right = False)
 
             if d == 2:
                 rc.plot_curve_2D(name = name, **plt_kwargs)
             elif d == 3:
                 rc.plot_curve_3D(name = name, **plt_kwargs)
+
+    ## BSPLINE SURFACE ##
+    cn = {
+        (0, 0): (0, 0, 1),
+        (1, 0): (1, 0, 1),
+        (2, 0): (2, 0, 1),
+        (0, 1): (0, 1, 1),
+        (0, 2): (0, 2, 1),
+        (1, 1): (1, 1, 1),
+        (2, 1): (2, 1, 1),
+        (2, 2): (2, 2, 1),
+        (1, 2): (1, 2, 1),
+        }
+    surf = BSplineSurface(
+            basis_1 = BSplineBasis([0, 0, 1, 2, 2], polynomial_order = 2, parameter_space_points = 100),
+            basis_2 = BSplineBasis([0, 0, 1, 2, 2], polynomial_order = 2, parameter_space_points = 100),
+            control_net = cn
+            )
+    surf.plot_surface_3D(name = 'surface', **plt_kwargs)
