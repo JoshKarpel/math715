@@ -103,15 +103,19 @@ class BSplineBasis:
     def __iter__(self):
         yield from (self.basis_function(basis_index, self.polynomial_order) for basis_index in self.basis_function_indices)
 
-    def plot_basis_functions(self, fig_scale = 'full', title = True, legend_on_right = True, **kwargs):
-        fig = utils.get_figure(fig_scale)
-        ax = fig.add_subplot(111)
-
+    def attach_basis_functions(self, ax):
         for basis_index in self.basis_function_indices:
             y = self.basis_function(basis_index, self.polynomial_order)  # get basis function
             y = ma.masked_equal(y, 0)  # mask zeros so they won't be displayed in the plot
 
             ax.plot(self.xi, y, label = rf'$N_{{ {basis_index}, {self.polynomial_order} }} $')
+
+
+    def plot_basis_functions(self, fig_scale = 'full', title = True, legend_on_right = True, **kwargs):
+        fig = utils.get_figure(fig_scale)
+        ax = fig.add_subplot(111)
+
+        self.attach_basis_functions(ax)
 
         ax.set_xlim(self.xi_min, self.xi_max)
         ax.set_ylim(0, 1.01)
@@ -162,11 +166,7 @@ class BSplineCurve:
         """Return the d-dimensional curve given by the control points and basis functions."""
         return sum(np.outer(basis_function, control_point) for basis_function, control_point in zip(self.basis, self.control_points)).T
 
-    def plot_curve_2D(self, fig_scale = 'full', **kwargs):
-        """Only works in 2D..."""
-        fig = utils.get_figure(fig_scale)
-        ax = fig.add_subplot(111)
-
+    def attach_curve_2D(self, ax):
         curve_x, curve_y = self.curve()
 
         control_points_x = np.array([control_point[0] for control_point in self.control_points])
@@ -180,13 +180,20 @@ class BSplineCurve:
         y_max = max(np.max(curve_y), np.max(control_points_y))
         y_range = np.abs(y_max - y_min)
 
-        ax.set_xlim(x_min - .02 * x_range, x_max + .02 * x_range)
-        ax.set_ylim(y_min - .02 * y_range, y_max + .02 * y_range)
+        ax.set_xlim(x_min - .05 * x_range, x_max + .05 * x_range)
+        ax.set_ylim(y_min - .05 * y_range, y_max + .05 * y_range)
 
         ax.plot(control_points_x, control_points_y, **CONTROL_POLYGON_KWARGS)
         ax.plot(curve_x, curve_y, **CURVE_KWARGS)
 
         ax.axis('off')
+
+    def plot_curve_2D(self, fig_scale = 'full', **kwargs):
+        """Only works in 2D..."""
+        fig = utils.get_figure(fig_scale)
+        ax = fig.add_subplot(111)
+
+        self.attach_curve_2D(ax)
 
         utils.save_current_figure(**kwargs)
 
@@ -352,10 +359,146 @@ class BSplineSurface:
 
         plt.close()
 
+
+def figure_8(**kwargs):
+    fig = utils.get_figure('full', aspect_ratio = .8)
+
+    ax_original_curve = fig.add_subplot(221)
+    ax_original_basis = fig.add_subplot(223)
+    ax_new_curve = fig.add_subplot(222)
+    ax_new_basis = fig.add_subplot(224)
+
+    original_basis = BSplineBasis([0, 0, 0, 1, 1, 1], polynomial_order = 2)
+    original_curve = BSplineCurve(original_basis,
+                                  [
+                                      (0, 0),
+                                      (.5, 1),
+                                      (1, 0)
+                                  ])
+
+    title_size = 10
+    ax_original_curve.set_title(r'Original Curve: $\Xi = \left[0, 0, 0, 1, 1, 1\right], \; p = 2$', fontsize = title_size)
+    ax_original_basis.set_title(r'Original Basis Functions', fontsize = title_size)
+    ax_new_curve.set_title(r'$h$-Refined Curve: $\Xi = \left[0, 0, 0, 1, 1, 1\right], \; p = 2$', fontsize = title_size)
+    ax_new_basis.set_title(r'$h$-Refined Basis Functions', fontsize = title_size)
+
+    new_basis = BSplineBasis([0, 0, 0, .5, 1, 1, 1], polynomial_order = 2)
+    new_curve = BSplineCurve(new_basis,
+                             [
+                                 (0, 0),
+                                 (.25, .5),
+                                 (.75, .5),
+                                 (1, 0)
+                             ])
+
+    for ax, basis in ((ax_original_curve, original_curve), (ax_new_curve, new_curve)):
+        basis.attach_curve_2D(ax)
+        ax.set_xlim(-.05, 1.05)
+        ax.set_ylim(-.05, 1.05)
+        ax.grid(True, linewidth = .5)
+        ax.axis('on')
+
+        ax.set_xticks((0, 1 / 4, 1 / 2, 3 / 4, 1))
+        ax.set_xticklabels((r'$0$',
+                            r'$\frac{1}{4}$',
+                            r'$\frac{1}{2}$',
+                            r'$\frac{3}{4}$',
+                            r'$1$',
+                            ))
+        ax.set_yticks((0, 1 / 2, 1))
+        ax.set_yticklabels((r'$0$',
+                            r'$\frac{1}{2}$',
+                            r'$1$',
+                            ))
+
+    for ax, basis in ((ax_original_basis, original_basis), (ax_new_basis, new_basis)):
+        basis.attach_basis_functions(ax)
+        ax.set_xlim(0, 1.0)
+        ax.set_ylim(0, 1.0)
+        ax.set_xlabel(r'$\xi$')
+        ax.grid(True, linewidth = .5)
+
+    ax_original_basis.set_ylabel(r'$N_{i, \,p}\left(\xi\right)$')
+
+    plt.tight_layout()
+
+    utils.save_current_figure('fig_8', **kwargs)
+
+    plt.close()
+
+
+def figure_9(**kwargs):
+    fig = utils.get_figure('full', aspect_ratio = .8)
+
+    ax_original_curve = fig.add_subplot(221)
+    ax_original_basis = fig.add_subplot(223)
+    ax_new_curve = fig.add_subplot(222)
+    ax_new_basis = fig.add_subplot(224)
+
+    original_basis = BSplineBasis([0, 0, 0, 1, 1, 1], polynomial_order = 2)
+    original_curve = BSplineCurve(original_basis,
+                                  [
+                                      (0, 0),
+                                      (.5, 1),
+                                      (1, 0)
+                                  ])
+
+    title_size = 10
+    ax_original_curve.set_title(r'Original Curve: $\Xi = \left[0, 0, 0, 1, 1, 1\right], \; p = 2$', fontsize = title_size)
+    ax_original_basis.set_title(r'Original Basis Functions', fontsize = title_size)
+    ax_new_curve.set_title(r'$p$-Refined Curve: $\Xi = \left[0, 0, 0, 0, 1, 1, 1, 1\right], \; p = 3$', fontsize = title_size)
+    ax_new_basis.set_title(r'$p$-Refined Basis Functions', fontsize = title_size)
+
+    new_basis = BSplineBasis([0, 0, 0, 0, 1, 1, 1, 1], polynomial_order = 3)
+    new_curve = BSplineCurve(new_basis,
+                             [
+                                 (0, 0),
+                                 (1 / 3, 2 / 3),
+                                 (2 / 3, 2 / 3),
+                                 (1, 0)
+                             ])
+
+    for ax, basis in ((ax_original_curve, original_curve), (ax_new_curve, new_curve)):
+        basis.attach_curve_2D(ax)
+        ax.set_xlim(-.05, 1.05)
+        ax.set_ylim(-.05, 1.05)
+        ax.grid(True, linewidth = .5)
+        ax.axis('on')
+
+        ax.set_xticks((0, 1 / 3, 2 / 3, 1))
+        ax.set_xticklabels((r'$0$',
+                            r'$\frac{1}{3}$',
+                            r'$\frac{2}{3}$',
+                            r'$1$',
+                            ))
+        ax.set_yticks((0, 2 / 3, 1))
+        ax.set_yticklabels((r'$0$',
+                            r'$\frac{2}{3}$',
+                            r'$1$',
+                            ))
+
+    for ax, basis in ((ax_original_basis, original_basis), (ax_new_basis, new_basis)):
+        basis.attach_basis_functions(ax)
+        ax.set_xlim(0, 1.0)
+        ax.set_ylim(0, 1.0)
+        ax.set_xlabel(r'$\xi$')
+        ax.grid(True, linewidth = .5)
+
+    ax_original_basis.set_ylabel(r'$N_{i, \,p}\left(\xi\right)$')
+
+    plt.tight_layout()
+
+    utils.save_current_figure('fig_9', **kwargs)
+
+    plt.close()
+
 if __name__ == '__main__':
     plt_kwargs = dict(
         target_dir = OUT_DIR,
     )
+
+    figure_8(**plt_kwargs)
+    figure_9(**plt_kwargs)
 
     ## TESTING BSPLINE BASIS FUNCTIONS ##
     bsplines = (
