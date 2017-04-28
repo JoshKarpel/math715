@@ -16,11 +16,11 @@ GRID_KWARGS = {
     'color': 'black',
     'linewidth': .25,
     'alpha': 0.4
-}
+    }
 
 
 class BSplineBasis:
-    def __init__(self, knot_vector, polynomial_order, parameter_space_points = 10000):
+    def __init__(self, knot_vector, polynomial_order, parameter_space_points = 1000):
         self.knot_vector = np.array(knot_vector)
         self.basis_function_indices = np.array(range(len(knot_vector) - polynomial_order - 1))
         self.polynomial_order = polynomial_order
@@ -40,7 +40,7 @@ class BSplineBasis:
             f'  Number of Knots: {self.number_of_knots}',
             f'  Number of Unique Knots: {self.number_of_unique_knots}',
             f'  # of Basis Functions + Polynomial Order + 1: {len(self.basis_function_indices) + self.polynomial_order + 1}',
-        ]
+            ]
 
         return '\n'.join(out)
 
@@ -110,7 +110,6 @@ class BSplineBasis:
 
             ax.plot(self.xi, y, label = rf'$N_{{ {basis_index}, {self.polynomial_order} }} $')
 
-
     def plot_basis_functions(self, fig_scale = 'full', title = True, legend_on_right = True, **kwargs):
         fig = utils.get_figure(fig_scale)
         ax = fig.add_subplot(111)
@@ -124,7 +123,7 @@ class BSplineBasis:
         ax.set_ylabel(r'$N_{i,p}(\xi)$', fontsize = 12)
 
         if title:
-            ax.set_title(fr'Basis Functions for $\Xi = \left[ {",".join(str(s) for s in self.knot_vector)} \right]$, $p = {self.polynomial_order}$')
+            ax.set_title(fr'Basis Functions for $\Xi = \left\lbrace {",".join(str(s) for s in self.knot_vector)} \right\rbrace$, $p = {self.polynomial_order}$')
 
         if legend_on_right:
             ax.legend(bbox_to_anchor = (1.02, 1), loc = 'upper left', borderaxespad = 0., fontsize = 12, handlelength = 1, ncol = 1 + (len(self.basis_function_indices) // 15))
@@ -139,16 +138,16 @@ class BSplineBasis:
 
 
 CONTROL_POLYGON_KWARGS = dict(
-    color = 'C3',
-    linestyle = '-',
-    marker = 'o',
-    linewidth = .75,
-)
+        color = 'C3',
+        linestyle = '-',
+        marker = 'o',
+        linewidth = .75,
+        )
 
 CURVE_KWARGS = dict(
-    color = 'C0',
-    linewidth = 2,
-)
+        color = 'C0',
+        linewidth = 2,
+        )
 
 
 class BSplineCurve:
@@ -374,12 +373,12 @@ def figure_8(**kwargs):
                                       (0, 0),
                                       (.5, 1),
                                       (1, 0)
-                                  ])
+                                      ])
 
     title_size = 10
-    ax_original_curve.set_title(r'Original Curve: $\Xi = \left[0, 0, 0, 1, 1, 1\right], \; p = 2$', fontsize = title_size)
+    ax_original_curve.set_title(r'Original Curve: $\Xi = \left\lbrace0, 0, 0, 1, 1, 1\right\rbrace, \; p = 2$', fontsize = title_size)
     ax_original_basis.set_title(r'Original Basis Functions', fontsize = title_size)
-    ax_new_curve.set_title(r'$h$-Refined Curve: $\Xi = \left[0, 0, 0, 1, 1, 1\right], \; p = 2$', fontsize = title_size)
+    ax_new_curve.set_title(r'$h$-Refined Curve: $\Xi = \left\lbrace0, 0, 0, 1, 1, 1\right\rbrace, \; p = 2$', fontsize = title_size)
     ax_new_basis.set_title(r'$h$-Refined Basis Functions', fontsize = title_size)
 
     new_basis = BSplineBasis([0, 0, 0, .5, 1, 1, 1], polynomial_order = 2)
@@ -389,7 +388,7 @@ def figure_8(**kwargs):
                                  (.25, .5),
                                  (.75, .5),
                                  (1, 0)
-                             ])
+                                 ])
 
     for ax, basis in ((ax_original_curve, original_curve), (ax_new_curve, new_curve)):
         basis.attach_curve_2D(ax)
@@ -416,7 +415,7 @@ def figure_8(**kwargs):
         ax.set_xlim(0, 1.0)
         ax.set_ylim(0, 1.0)
         ax.set_xlabel(r'$\xi$')
-        ax.grid(True, linewidth = .5)
+        ax.grid(True, **GRID_KWARGS)
 
     ax_original_basis.set_ylabel(r'$N_{i, \,p}\left(\xi\right)$')
 
@@ -441,12 +440,12 @@ def figure_9(**kwargs):
                                       (0, 0),
                                       (.5, 1),
                                       (1, 0)
-                                  ])
+                                      ])
 
     title_size = 10
-    ax_original_curve.set_title(r'Original Curve: $\Xi = \left[0, 0, 0, 1, 1, 1\right], \; p = 2$', fontsize = title_size)
+    ax_original_curve.set_title(r'Original Curve: $\Xi = \left\lbrace0, 0, 0, 1, 1, 1\right\rbrace, \; p = 2$', fontsize = title_size)
     ax_original_basis.set_title(r'Original Basis Functions', fontsize = title_size)
-    ax_new_curve.set_title(r'$p$-Refined Curve: $\Xi = \left[0, 0, 0, 0, 1, 1, 1, 1\right], \; p = 3$', fontsize = title_size)
+    ax_new_curve.set_title(r'$p$-Refined Curve: $\Xi = \left\lbrace0, 0, 0, 0, 1, 1, 1, 1\right\rbrace, \; p = 3$', fontsize = title_size)
     ax_new_basis.set_title(r'$p$-Refined Basis Functions', fontsize = title_size)
 
     new_basis = BSplineBasis([0, 0, 0, 0, 1, 1, 1, 1], polynomial_order = 3)
@@ -456,7 +455,7 @@ def figure_9(**kwargs):
                                  (1 / 3, 2 / 3),
                                  (2 / 3, 2 / 3),
                                  (1, 0)
-                             ])
+                                 ])
 
     for ax, basis in ((ax_original_curve, original_curve), (ax_new_curve, new_curve)):
         basis.attach_curve_2D(ax)
@@ -482,7 +481,7 @@ def figure_9(**kwargs):
         ax.set_xlim(0, 1.0)
         ax.set_ylim(0, 1.0)
         ax.set_xlabel(r'$\xi$')
-        ax.grid(True, linewidth = .5)
+        ax.grid(True, **GRID_KWARGS)
 
     ax_original_basis.set_ylabel(r'$N_{i, \,p}\left(\xi\right)$')
 
@@ -492,13 +491,135 @@ def figure_9(**kwargs):
 
     plt.close()
 
+
+def figure_10a(**kwargs):
+    fig = utils.get_figure('half')
+    ax = fig.add_subplot(111)
+
+    basis = BSplineBasis([0, 0, 1, 1], polynomial_order = 1)
+
+    basis.attach_basis_functions(ax)
+
+    title_size = 10
+    ax.set_xlabel(r'$\xi$', fontsize = title_size)
+    ax.set_ylabel(r'$N_{i, \,p}\left(\xi\right)$', fontsize = title_size)
+    ax.set_title(r'$\Xi = \left\lbrace 0, 0, 1, 1 \right\rbrace, \, p = 1$', fontsize = title_size)
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.grid(True, **GRID_KWARGS)
+
+    utils.save_current_figure('fig_10a', **kwargs)
+
+    plt.close()
+
+
+def figure_10b(**kwargs):
+    fig = utils.get_figure(.425, aspect_ratio = 1 / utils.golden_ratio)
+
+    # ax_upper = fig.add_subplot(211)
+    # ax_lower = fig.add_subplot(212)
+
+    ax_upper = fig.add_axes([.2, .6, .75, .25])
+    ax_lower = fig.add_axes([.2, .1, .75, .25])
+
+    axes = (ax_upper, ax_lower)
+
+    basis_upper = BSplineBasis([0, 0, 1 / 3, 2 / 3, 1, 1], polynomial_order = 1)
+    basis_lower = BSplineBasis([0, 0, 0, 1 / 3, 1 / 3, 2 / 3, 2 / 3, 1, 1, 1], polynomial_order = 2)
+    bases = (basis_upper, basis_lower)
+
+    titles = (r'$\Xi = \left\lbrace 0, 0, \frac{1}{3}, \frac{2}{3}, 1, 1 \right\rbrace, \, p = 1$',
+              r'$\Xi = \left\lbrace 0, 0, 0, \frac{1}{3}, \frac{1}{3}, \frac{2}{3}, \frac{2}{3}, 1, 1, 1 \right\rbrace, \, p = 2$')
+
+    method = (r'$h$-refinement \\ (knot insertion)',
+              r'$p$-refinement \\ (order elevation)')
+
+    for ax, basis, title, method in zip(axes, bases, titles, method):
+        basis.attach_basis_functions(ax)
+
+        title_size = 10
+        ax.set_ylabel(r'$N_{i, \,p}\left(\xi\right)$', fontsize = title_size)
+        ax.set_xlabel(r'$\xi$', fontsize = title_size)
+        ax.set_title(title, fontsize = title_size)
+        ax.set_xlim(0, 1.0)
+        ax.set_ylim(0, 1.0)
+        ax.grid(True, **GRID_KWARGS)
+
+        ax.annotate(s = method, xy = (0.5, 1.275), xycoords = 'axes fraction', xytext = (10, 8), textcoords = 'offset points',
+                    fontsize = title_size, )
+
+        ax.annotate(s = '', xy = (0.5, 1.275), xycoords = 'axes fraction', xytext = (0, 25), textcoords = 'offset points',
+                    arrowprops = dict(
+                            width = 1, facecolor = 'black', headlength = 10,
+                            ))
+
+    # plt.tight_layout()
+
+    utils.save_current_figure('fig_10b', tight = False, **kwargs)
+
+    plt.close()
+
+
+def figure_10c(**kwargs):
+    fig = utils.get_figure(.425, aspect_ratio = 1 / utils.golden_ratio)
+
+    # ax_upper = fig.add_subplot(211)
+    # ax_lower = fig.add_subplot(212)
+
+    ax_upper = fig.add_axes([.2, .6, .75, .25])
+    ax_lower = fig.add_axes([.2, .1, .75, .25])
+
+    axes = (ax_upper, ax_lower)
+
+    basis_upper = BSplineBasis([0, 0, 0, 1, 1, 1], polynomial_order = 2)
+    basis_lower = BSplineBasis([0, 0, 0, 1 / 3, 2 / 3, 1, 1, 1], polynomial_order = 2)
+    bases = (basis_upper, basis_lower)
+
+    titles = (r'$\Xi = \left\lbrace 0, 0, 0, 1, 1, 1 \right\rbrace, \, p = 2$',
+              r'$\Xi = \left\lbrace 0, 0, 0, \frac{1}{3}, \frac{2}{3}, 1, 1, 1 \right\rbrace, \, p = 2$')
+
+    method = (r'$p$-refinement \\ (order elevation)',
+              r'$h$-refinement \\ (knot insertion)')
+
+    for ax, basis, title, method in zip(axes, bases, titles, method):
+        basis.attach_basis_functions(ax)
+
+        title_size = 10
+        ax.set_ylabel(r'$N_{i, \,p}\left(\xi\right)$', fontsize = title_size)
+        ax.set_xlabel(r'$\xi$', fontsize = title_size)
+        ax.set_title(title, fontsize = title_size)
+        ax.set_xlim(0, 1.0)
+        ax.set_ylim(0, 1.0)
+        ax.grid(True, **GRID_KWARGS)
+
+        ax.annotate(s = method, xy = (0.5, 1.275), xycoords = 'axes fraction', xytext = (10, 8), textcoords = 'offset points',
+                    fontsize = title_size, )
+
+        ax.annotate(s = '', xy = (0.5, 1.275), xycoords = 'axes fraction', xytext = (0, 25), textcoords = 'offset points',
+                    arrowprops = dict(
+                            width = 1, facecolor = 'black', headlength = 10,
+                            ))
+
+    # plt.tight_layout()
+
+    utils.save_current_figure('fig_10c', tight = False, **kwargs)
+
+    plt.close()
+
+
 if __name__ == '__main__':
     plt_kwargs = dict(
-        target_dir = OUT_DIR,
-    )
+            target_dir = OUT_DIR,
+            )
 
-    figure_8(**plt_kwargs)
-    figure_9(**plt_kwargs)
+    for fmt in ('pdf', 'pgf'):
+        kw = dict(img_format = fmt, **plt_kwargs)
+
+        figure_8(**kw)
+        figure_9(**kw)
+        figure_10a(**kw)
+        figure_10b(**kw)
+        figure_10c(**kw)
 
     ## TESTING BSPLINE BASIS FUNCTIONS ##
     bsplines = (
@@ -506,13 +627,13 @@ if __name__ == '__main__':
         BSplineBasis(knot_vector = [0, 1, 2, 3, 4, 5], polynomial_order = 1),
         BSplineBasis(knot_vector = [0, 1, 2, 3, 4, 5], polynomial_order = 2),
         BSplineBasis(knot_vector = [0, 1, 2, 3, 4, 5], polynomial_order = 3),
-        BSplineBasis(knot_vector = [0, 1, 2, 3, 4, 5], polynomial_order = 4),
-        BSplineBasis(knot_vector = [0, 0, 1, 2, 3, 4, 5], polynomial_order = 2),
-        BSplineBasis(knot_vector = [0, 0, 1, 2, 3, 4, 5, 5], polynomial_order = 1),
-        # BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5], polynomial_order = 2),
+        # BSplineBasis(knot_vector = [0, 1, 2, 3, 4, 5], polynomial_order = 4),
+        # BSplineBasis(knot_vector = [0, 0, 1, 2, 3, 4, 5], polynomial_order = 2),
+        # BSplineBasis(knot_vector = [0, 0, 1, 2, 3, 4, 5, 5], polynomial_order = 1),
+        BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5], polynomial_order = 2),
         # BSplineBasis(knot_vector = [0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 6, 7, 7, 8, 8, 9, 9, 9], polynomial_order = 3),
         # BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 2, 3, 3, 4, 5, 5, 6, 7, 7, 8, 8, 9, 9, 9], polynomial_order = 4),
-    )
+        )
     for bspline in bsplines:
         print(bspline.info())
         bspline.plot_basis_functions(**plt_kwargs)
@@ -533,7 +654,7 @@ if __name__ == '__main__':
         (2.5, -1),
         (3, 0),
         (3.5, 0),
-    ])
+        ])
     paper_curve.plot_curve_2D(name = 'paper_curve', **plt_kwargs)
     paper_curve.plot_curve_2D(name = 'paper_curve', **plt_kwargs, img_format = 'pgf', fig_scale = 'full', title = False, legend_on_right = True)
 
@@ -561,7 +682,7 @@ if __name__ == '__main__':
         (2.5, -1, 2),
         (3, 0, -2),
         (3.5, 0, 3),
-    ])
+        ])
     fancy_curve.plot_curve_3D(name = 'fancy_curve', **plt_kwargs)
 
     ## RANDOM CURVES ##
@@ -570,7 +691,7 @@ if __name__ == '__main__':
         (8, 3, 2),
         (6, 2, 3),
         (10, 4, 3)
-    )
+        )
     for uk, p, d in uk_p_d:
         random_curves = list(random_curve(uk, polynomial_order = p, dimensions = d) for _ in range(5))
         for ii, rc in enumerate(random_curves):
@@ -590,21 +711,21 @@ if __name__ == '__main__':
             elif d == 3:
                 rc.plot_curve_3D(name = name, **plt_kwargs)
 
-    ## BSPLINE SURFACE ##
-    cn = {
-        (0, 0): (0, 0, 1),
-        (1, 0): (1, 0, 1),
-        (2, 0): (2, 0, 1),
-        (0, 1): (0, 1, 1),
-        (0, 2): (0, 2, 1),
-        (1, 1): (1, 1, 1),
-        (2, 1): (2, 1, 1),
-        (2, 2): (2, 2, 1),
-        (1, 2): (1, 2, 1),
-        }
-    surf = BSplineSurface(
-            basis_1 = BSplineBasis([0, 0, 1, 2, 2], polynomial_order = 2, parameter_space_points = 100),
-            basis_2 = BSplineBasis([0, 0, 1, 2, 2], polynomial_order = 2, parameter_space_points = 100),
-            control_net = cn
-            )
-    surf.plot_surface_3D(name = 'surface', **plt_kwargs)
+                # ## BSPLINE SURFACE ##
+                # cn = {
+                #     (0, 0): (0, 0, 1),
+                #     (1, 0): (1, 0, 1),
+                #     (2, 0): (2, 0, 1),
+                #     (0, 1): (0, 1, 1),
+                #     (0, 2): (0, 2, 1),
+                #     (1, 1): (1, 1, 1),
+                #     (2, 1): (2, 1, 1),
+                #     (2, 2): (2, 2, 1),
+                #     (1, 2): (1, 2, 1),
+                #     }
+                # surf = BSplineSurface(
+                #         basis_1 = BSplineBasis([0, 0, 1, 2, 2], polynomial_order = 2, parameter_space_points = 100),
+                #         basis_2 = BSplineBasis([0, 0, 1, 2, 2], polynomial_order = 2, parameter_space_points = 100),
+                #         control_net = cn
+                #         )
+                # surf.plot_surface_3D(name = 'surface', **plt_kwargs)

@@ -17,7 +17,10 @@ mpl.use('Agg')
 #     'mathtext.rm': 'serif',
 # }
 
-def figsize(scale, fig_width_pts = 498.66258, aspect_ratio = (np.sqrt(5.0) - 1.0) / 2.0):
+golden_ratio = (np.sqrt(5.0) - 1.0) / 2.0
+
+
+def figsize(scale, fig_width_pts = 498.66258, aspect_ratio = golden_ratio):
     """
     Helper function for get_figure
 
@@ -72,7 +75,7 @@ def ensure_dir_exists(path):
     os.makedirs(make_path, exist_ok = True)
 
 
-def save_current_figure(name = 'img', target_dir = None, img_format = 'pdf', scale_factor = 1, **kwargs):
+def save_current_figure(name = 'img', target_dir = None, img_format = 'pdf', scale_factor = 1, tight = True, **kwargs):
     """Save the current matplotlib figure with the given name to the given folder."""
     if target_dir is None:
         target_dir = os.getcwd()
@@ -80,7 +83,10 @@ def save_current_figure(name = 'img', target_dir = None, img_format = 'pdf', sca
 
     ensure_dir_exists(path)
 
-    plt.savefig(path, dpi = scale_factor * plt.gcf().dpi, bbox_inches = 'tight')
+    if tight:
+        plt.savefig(path, dpi = scale_factor * plt.gcf().dpi, bbox_inches = 'tight')
+    else:
+        plt.savefig(path, dpi = scale_factor * plt.gcf().dpi)
 
 
 def figsize(scale, fig_width_pts = 498.66258, aspect_ratio = (np.sqrt(5.0) - 1.0) / 2.0):
