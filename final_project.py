@@ -16,7 +16,7 @@ GRID_KWARGS = {
     'color': 'black',
     'linewidth': .25,
     'alpha': 0.4
-    }
+}
 
 
 class BSplineBasis:
@@ -40,7 +40,7 @@ class BSplineBasis:
             f'  Number of Knots: {self.number_of_knots}',
             f'  Number of Unique Knots: {self.number_of_unique_knots}',
             f'  # of Basis Functions + Polynomial Order + 1: {len(self.basis_function_indices) + self.polynomial_order + 1}',
-            ]
+        ]
 
         return '\n'.join(out)
 
@@ -138,16 +138,16 @@ class BSplineBasis:
 
 
 CONTROL_POLYGON_KWARGS = dict(
-        color = 'C3',
-        linestyle = '-',
-        marker = 'o',
-        linewidth = .75,
-        )
+    color = 'C3',
+    linestyle = '-',
+    marker = 'o',
+    linewidth = .75,
+)
 
 CURVE_KWARGS = dict(
-        color = 'C0',
-        linewidth = 2,
-        )
+    color = 'C0',
+    linewidth = 2,
+)
 
 
 class BSplineCurve:
@@ -373,13 +373,11 @@ def figure_8(**kwargs):
                                       (0, 0),
                                       (.5, 1),
                                       (1, 0)
-                                      ])
+                                  ])
 
     title_size = 10
     ax_original_curve.set_title(r'Original Curve: $\Xi = \left\lbrace0, 0, 0, 1, 1, 1\right\rbrace, \; p = 2$', fontsize = title_size)
     ax_original_basis.set_title(r'Original Basis Functions', fontsize = title_size)
-    ax_new_curve.set_title(r'$h$-Refined Curve: $\Xi = \left\lbrace0, 0, 0, 1, 1, 1\right\rbrace, \; p = 2$', fontsize = title_size)
-    ax_new_basis.set_title(r'$h$-Refined Basis Functions', fontsize = title_size)
 
     new_basis = BSplineBasis([0, 0, 0, .5, 1, 1, 1], polynomial_order = 2)
     new_curve = BSplineCurve(new_basis,
@@ -388,7 +386,10 @@ def figure_8(**kwargs):
                                  (.25, .5),
                                  (.75, .5),
                                  (1, 0)
-                                 ])
+                             ])
+
+    ax_new_curve.set_title(r"$h$-Refined Curve: $\Xi' = \left\lbrace0, 0, 0, 0.5, 1, 1, 1\right\rbrace, \; p = 2$", fontsize = title_size)
+    ax_new_basis.set_title(r'$h$-Refined Basis Functions', fontsize = title_size)
 
     for ax, basis in ((ax_original_curve, original_curve), (ax_new_curve, new_curve)):
         basis.attach_curve_2D(ax)
@@ -440,12 +441,12 @@ def figure_9(**kwargs):
                                       (0, 0),
                                       (.5, 1),
                                       (1, 0)
-                                      ])
+                                  ])
 
     title_size = 10
     ax_original_curve.set_title(r'Original Curve: $\Xi = \left\lbrace0, 0, 0, 1, 1, 1\right\rbrace, \; p = 2$', fontsize = title_size)
     ax_original_basis.set_title(r'Original Basis Functions', fontsize = title_size)
-    ax_new_curve.set_title(r'$p$-Refined Curve: $\Xi = \left\lbrace0, 0, 0, 0, 1, 1, 1, 1\right\rbrace, \; p = 3$', fontsize = title_size)
+    ax_new_curve.set_title(r"$p$-Refined Curve: $\Xi' = \left\lbrace0, 0, 0, 0, 1, 1, 1, 1\right\rbrace, \; p = 3$", fontsize = title_size)
     ax_new_basis.set_title(r'$p$-Refined Basis Functions', fontsize = title_size)
 
     new_basis = BSplineBasis([0, 0, 0, 0, 1, 1, 1, 1], polynomial_order = 3)
@@ -455,7 +456,7 @@ def figure_9(**kwargs):
                                  (1 / 3, 2 / 3),
                                  (2 / 3, 2 / 3),
                                  (1, 0)
-                                 ])
+                             ])
 
     for ax, basis in ((ax_original_curve, original_curve), (ax_new_curve, new_curve)):
         basis.attach_curve_2D(ax)
@@ -528,8 +529,8 @@ def figure_10b(**kwargs):
     basis_lower = BSplineBasis([0, 0, 0, 1 / 3, 1 / 3, 2 / 3, 2 / 3, 1, 1, 1], polynomial_order = 2)
     bases = (basis_upper, basis_lower)
 
-    titles = (r'$\Xi = \left\lbrace 0, 0, \frac{1}{3}, \frac{2}{3}, 1, 1 \right\rbrace, \, p = 1$',
-              r'$\Xi = \left\lbrace 0, 0, 0, \frac{1}{3}, \frac{1}{3}, \frac{2}{3}, \frac{2}{3}, 1, 1, 1 \right\rbrace, \, p = 2$')
+    titles = (r"$\Xi' = \left\lbrace 0, 0, \frac{1}{3}, \frac{2}{3}, 1, 1 \right\rbrace, \, p = 1$",
+              r"$\Xi'' = \left\lbrace 0, 0, 0, \frac{1}{3}, \frac{1}{3}, \frac{2}{3}, \frac{2}{3}, 1, 1, 1 \right\rbrace, \, p = 2$")
 
     method = (r'$h$-refinement \\ (knot insertion)',
               r'$p$-refinement \\ (order elevation)')
@@ -550,8 +551,8 @@ def figure_10b(**kwargs):
 
         ax.annotate(s = '', xy = (0.5, 1.275), xycoords = 'axes fraction', xytext = (0, 25), textcoords = 'offset points',
                     arrowprops = dict(
-                            width = 1, facecolor = 'black', headlength = 10,
-                            ))
+                        width = 1, facecolor = 'black', headlength = 10,
+                    ))
 
     # plt.tight_layout()
 
@@ -575,8 +576,8 @@ def figure_10c(**kwargs):
     basis_lower = BSplineBasis([0, 0, 0, 1 / 3, 2 / 3, 1, 1, 1], polynomial_order = 2)
     bases = (basis_upper, basis_lower)
 
-    titles = (r'$\Xi = \left\lbrace 0, 0, 0, 1, 1, 1 \right\rbrace, \, p = 2$',
-              r'$\Xi = \left\lbrace 0, 0, 0, \frac{1}{3}, \frac{2}{3}, 1, 1, 1 \right\rbrace, \, p = 2$')
+    titles = (r"$\Xi' = \left\lbrace 0, 0, 0, 1, 1, 1 \right\rbrace, \, p = 2$",
+              r"$\Xi'' = \left\lbrace 0, 0, 0, \frac{1}{3}, \frac{2}{3}, 1, 1, 1 \right\rbrace, \, p = 2$")
 
     method = (r'$p$-refinement \\ (order elevation)',
               r'$h$-refinement \\ (knot insertion)')
@@ -597,8 +598,8 @@ def figure_10c(**kwargs):
 
         ax.annotate(s = '', xy = (0.5, 1.275), xycoords = 'axes fraction', xytext = (0, 25), textcoords = 'offset points',
                     arrowprops = dict(
-                            width = 1, facecolor = 'black', headlength = 10,
-                            ))
+                        width = 1, facecolor = 'black', headlength = 10,
+                    ))
 
     # plt.tight_layout()
 
@@ -609,8 +610,8 @@ def figure_10c(**kwargs):
 
 if __name__ == '__main__':
     plt_kwargs = dict(
-            target_dir = OUT_DIR,
-            )
+        target_dir = OUT_DIR,
+    )
 
     for fmt in ('pdf', 'pgf'):
         kw = dict(img_format = fmt, **plt_kwargs)
@@ -633,7 +634,7 @@ if __name__ == '__main__':
         BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5], polynomial_order = 2),
         # BSplineBasis(knot_vector = [0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 6, 7, 7, 8, 8, 9, 9, 9], polynomial_order = 3),
         # BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 2, 3, 3, 4, 5, 5, 6, 7, 7, 8, 8, 9, 9, 9], polynomial_order = 4),
-        )
+    )
     for bspline in bsplines:
         print(bspline.info())
         bspline.plot_basis_functions(**plt_kwargs)
@@ -654,78 +655,78 @@ if __name__ == '__main__':
         (2.5, -1),
         (3, 0),
         (3.5, 0),
-        ])
+    ])
     paper_curve.plot_curve_2D(name = 'paper_curve', **plt_kwargs)
     paper_curve.plot_curve_2D(name = 'paper_curve', **plt_kwargs, img_format = 'pgf', fig_scale = 'full', title = False, legend_on_right = True)
 
-    ## NURBS CURVE ##
-    nurbs_curve = NURBSCurve(BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5], polynomial_order = 2), [
-        (0, 0),
-        (0, 1),
-        (1, -1),
-        (1, .5),
-        (2, .5),
-        (2.5, -1),
-        (3, 0),
-        (3.5, 0),
-        ], weights = [1, 2, 1, 3, .5, 1, 1, 1])
-    nurbs_curve.plot_curve_2D(name = 'nurbs_curve', **plt_kwargs)
-    nurbs_curve.plot_curve_2D(name = 'nurbs_curve', **plt_kwargs, img_format = 'pgf', fig_scale = 'full')
-
-    ## 3D VERSION OF PAPER CURVE ##
-    fancy_curve = BSplineCurve(BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5], polynomial_order = 2), [
-        (0, 0, 0),
-        (0, 1, 1),
-        (1, -1, 2),
-        (1, .5, -.5),
-        (2, .5, 0),
-        (2.5, -1, 2),
-        (3, 0, -2),
-        (3.5, 0, 3),
-        ])
-    fancy_curve.plot_curve_3D(name = 'fancy_curve', **plt_kwargs)
-
-    ## RANDOM CURVES ##
-    uk_p_d = (
-        (6, 2, 2),
-        (8, 3, 2),
-        (6, 2, 3),
-        (10, 4, 3)
-        )
-    for uk, p, d in uk_p_d:
-        random_curves = list(random_curve(uk, polynomial_order = p, dimensions = d) for _ in range(5))
-        for ii, rc in enumerate(random_curves):
-            print(rc.info())
-            print('-' * 80)
-
-            name = f'rc_uk={uk}_p={p}_d={d}__{ii}__' + rc.basis.name
-
-            with open(os.path.join(OUT_DIR, f'{name}.txt'), mode = 'w') as f:
-                f.write(rc.info())
-
-            rc.basis.plot_basis_functions(**plt_kwargs)
-            rc.basis.plot_basis_functions(**plt_kwargs, img_format = 'pgf', fig_scale = 'half', title = False, legend_on_right = False)
-
-            if d == 2:
-                rc.plot_curve_2D(name = name, **plt_kwargs)
-            elif d == 3:
-                rc.plot_curve_3D(name = name, **plt_kwargs)
-
-                # ## BSPLINE SURFACE ##
-                # cn = {
-                #     (0, 0): (0, 0, 1),
-                #     (1, 0): (1, 0, 1),
-                #     (2, 0): (2, 0, 1),
-                #     (0, 1): (0, 1, 1),
-                #     (0, 2): (0, 2, 1),
-                #     (1, 1): (1, 1, 1),
-                #     (2, 1): (2, 1, 1),
-                #     (2, 2): (2, 2, 1),
-                #     (1, 2): (1, 2, 1),
-                #     }
-                # surf = BSplineSurface(
-                #         basis_1 = BSplineBasis([0, 0, 1, 2, 2], polynomial_order = 2, parameter_space_points = 100),
-                #         basis_2 = BSplineBasis([0, 0, 1, 2, 2], polynomial_order = 2, parameter_space_points = 100),
-                #         control_net = cn
-                #         )
-                # surf.plot_surface_3D(name = 'surface', **plt_kwargs)
+    # ## NURBS CURVE ##
+    # nurbs_curve = NURBSCurve(BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5], polynomial_order = 2), [
+    #     (0, 0),
+    #     (0, 1),
+    #     (1, -1),
+    #     (1, .5),
+    #     (2, .5),
+    #     (2.5, -1),
+    #     (3, 0),
+    #     (3.5, 0),
+    #     ], weights = [1, 2, 1, 3, .5, 1, 1, 1])
+    # nurbs_curve.plot_curve_2D(name = 'nurbs_curve', **plt_kwargs)
+    # nurbs_curve.plot_curve_2D(name = 'nurbs_curve', **plt_kwargs, img_format = 'pgf', fig_scale = 'full')
+    #
+    # ## 3D VERSION OF PAPER CURVE ##
+    # fancy_curve = BSplineCurve(BSplineBasis(knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5], polynomial_order = 2), [
+    #     (0, 0, 0),
+    #     (0, 1, 1),
+    #     (1, -1, 2),
+    #     (1, .5, -.5),
+    #     (2, .5, 0),
+    #     (2.5, -1, 2),
+    #     (3, 0, -2),
+    #     (3.5, 0, 3),
+    #     ])
+    # fancy_curve.plot_curve_3D(name = 'fancy_curve', **plt_kwargs)
+    #
+    # ## RANDOM CURVES ##
+    # uk_p_d = (
+    #     (6, 2, 2),
+    #     (8, 3, 2),
+    #     (6, 2, 3),
+    #     (10, 4, 3)
+    #     )
+    # for uk, p, d in uk_p_d:
+    #     random_curves = list(random_curve(uk, polynomial_order = p, dimensions = d) for _ in range(5))
+    #     for ii, rc in enumerate(random_curves):
+    #         print(rc.info())
+    #         print('-' * 80)
+    #
+    #         name = f'rc_uk={uk}_p={p}_d={d}__{ii}__' + rc.basis.name
+    #
+    #         with open(os.path.join(OUT_DIR, f'{name}.txt'), mode = 'w') as f:
+    #             f.write(rc.info())
+    #
+    #         rc.basis.plot_basis_functions(**plt_kwargs)
+    #         rc.basis.plot_basis_functions(**plt_kwargs, img_format = 'pgf', fig_scale = 'half', title = False, legend_on_right = False)
+    #
+    #         if d == 2:
+    #             rc.plot_curve_2D(name = name, **plt_kwargs)
+    #         elif d == 3:
+    #             rc.plot_curve_3D(name = name, **plt_kwargs)
+    #
+    #             # ## BSPLINE SURFACE ##
+    #             # cn = {
+    #             #     (0, 0): (0, 0, 1),
+    #             #     (1, 0): (1, 0, 1),
+    #             #     (2, 0): (2, 0, 1),
+    #             #     (0, 1): (0, 1, 1),
+    #             #     (0, 2): (0, 2, 1),
+    #             #     (1, 1): (1, 1, 1),
+    #             #     (2, 1): (2, 1, 1),
+    #             #     (2, 2): (2, 2, 1),
+    #             #     (1, 2): (1, 2, 1),
+    #             #     }
+    #             # surf = BSplineSurface(
+    #             #         basis_1 = BSplineBasis([0, 0, 1, 2, 2], polynomial_order = 2, parameter_space_points = 100),
+    #             #         basis_2 = BSplineBasis([0, 0, 1, 2, 2], polynomial_order = 2, parameter_space_points = 100),
+    #             #         control_net = cn
+    #             #         )
+    #             # surf.plot_surface_3D(name = 'surface', **plt_kwargs)
