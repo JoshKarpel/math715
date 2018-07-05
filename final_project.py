@@ -120,11 +120,11 @@ class BSplineBasis:
         ax.set_xlim(self.xi_min, self.xi_max)
         ax.set_ylim(0, 1.01)
 
-        ax.set_xlabel(r'$\xi$', fontsize = 12)
-        ax.set_ylabel(r'$N_{i,p}(\xi)$', fontsize = 12)
+        ax.set_xlabel(r'$\chi$', fontsize = 12)
+        ax.set_ylabel(r'$N_{i,p}(\chi)$', fontsize = 12)
 
         if title:
-            ax.set_title(fr'Basis Functions for $\Xi = \left\lbrace {",".join(str(s) for s in self.knot_vector)} \right\rbrace$, $p = {self.polynomial_order}$')
+            ax.set_title(fr'Basis Functions for $\Theta = \left\lbrace {",".join(str(s) for s in self.knot_vector)} \right\rbrace$, $p = {self.polynomial_order}$')
 
         if legend_on_right:
             ax.legend(bbox_to_anchor = (1.02, 1), loc = 'upper left', borderaxespad = 0., fontsize = 12, handlelength = 1, ncol = 1 + (len(self.basis_function_indices) // 15))
@@ -424,7 +424,7 @@ def figure_8(**kwargs):
                                   ])
 
     title_size = 10
-    ax_original_curve.set_title(r'Original Curve: $\Xi = \left\lbrace0, 0, 0, 1, 1, 1\right\rbrace, \; p = 2$', fontsize = title_size)
+    ax_original_curve.set_title(r'Original Curve: $\Theta = \left\lbrace 0, 0, 0, 1, 1, 1\right\rbrace, \; p = 2$', fontsize = title_size)
     ax_original_basis.set_title(r'Original Basis Functions', fontsize = title_size)
 
     new_basis = BSplineBasis([0, 0, 0, .5, 1, 1, 1], polynomial_order = 2)
@@ -436,7 +436,7 @@ def figure_8(**kwargs):
                                  (1, 0)
                              ])
 
-    ax_new_curve.set_title(r"$h$-Refined Curve: $\Xi' = \left\lbrace0, 0, 0, 0.5, 1, 1, 1\right\rbrace, \; p = 2$", fontsize = title_size)
+    ax_new_curve.set_title(r"$h$-Refined Curve: $\Theta' = \left\lbrace 0, 0, 0, 0.5, 1, 1, 1\right\rbrace, \; p = 2$", fontsize = title_size)
     ax_new_basis.set_title(r'$h$-Refined Basis Functions', fontsize = title_size)
 
     for ax, basis in ((ax_original_curve, original_curve), (ax_new_curve, new_curve)):
@@ -463,10 +463,10 @@ def figure_8(**kwargs):
         basis.attach_basis_functions(ax)
         ax.set_xlim(0, 1.0)
         ax.set_ylim(0, 1.0)
-        ax.set_xlabel(r'$\xi$')
+        ax.set_xlabel(r'$\chi$')
         ax.grid(True, **GRID_KWARGS)
 
-    ax_original_basis.set_ylabel(r'$N_{i, \,p}\left(\xi\right)$')
+    ax_original_basis.set_ylabel(r'$N_{i, \,p}\left(\chi\right)$')
 
     plt.tight_layout()
 
@@ -492,9 +492,9 @@ def figure_9(**kwargs):
                                   ])
 
     title_size = 10
-    ax_original_curve.set_title(r'Original Curve: $\Xi = \left\lbrace0, 0, 0, 1, 1, 1\right\rbrace, \; p = 2$', fontsize = title_size)
+    ax_original_curve.set_title(r'Original Curve: $\Theta = \left\lbrace 0, 0, 0, 1, 1, 1 \right\rbrace, \; p = 2$', fontsize = title_size)
     ax_original_basis.set_title(r'Original Basis Functions', fontsize = title_size)
-    ax_new_curve.set_title(r"$p$-Refined Curve: $\Xi' = \left\lbrace0, 0, 0, 0, 1, 1, 1, 1\right\rbrace, \; p = 3$", fontsize = title_size)
+    ax_new_curve.set_title(r"$p$-Refined Curve: $\Theta' = \left\lbrace 0, 0, 0, 0, 1, 1, 1, 1 \right\rbrace, \; p = 3$", fontsize = title_size)
     ax_new_basis.set_title(r'$p$-Refined Basis Functions', fontsize = title_size)
 
     new_basis = BSplineBasis([0, 0, 0, 0, 1, 1, 1, 1], polynomial_order = 3)
@@ -529,10 +529,10 @@ def figure_9(**kwargs):
         basis.attach_basis_functions(ax)
         ax.set_xlim(0, 1.0)
         ax.set_ylim(0, 1.0)
-        ax.set_xlabel(r'$\xi$')
+        ax.set_xlabel(r'$\chi$')
         ax.grid(True, **GRID_KWARGS)
 
-    ax_original_basis.set_ylabel(r'$N_{i, \,p}\left(\xi\right)$')
+    ax_original_basis.set_ylabel(r'$N_{i, \,p}\left(\chi\right)$')
 
     plt.tight_layout()
 
@@ -550,9 +550,9 @@ def figure_10a(**kwargs):
     basis.attach_basis_functions(ax)
 
     title_size = 10
-    ax.set_xlabel(r'$\xi$', fontsize = title_size)
-    ax.set_ylabel(r'$N_{i, \,p}\left(\xi\right)$', fontsize = title_size)
-    ax.set_title(r'$\Xi = \left\lbrace 0, 0, 1, 1 \right\rbrace, \, p = 1$', fontsize = title_size)
+    ax.set_xlabel(r'$\chi$', fontsize = title_size)
+    ax.set_ylabel(r'$N_{i, \,p}\left(\chi\right)$', fontsize = title_size)
+    ax.set_title(r'$\Theta = \left\lbrace 0, 0, 1, 1 \right\rbrace, \, p = 1$', fontsize = title_size)
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
     ax.grid(True, **GRID_KWARGS)
@@ -577,8 +577,8 @@ def figure_10b(**kwargs):
     basis_lower = BSplineBasis([0, 0, 0, 1 / 3, 1 / 3, 2 / 3, 2 / 3, 1, 1, 1], polynomial_order = 2)
     bases = (basis_upper, basis_lower)
 
-    titles = (r"$\Xi' = \left\lbrace 0, 0, \frac{1}{3}, \frac{2}{3}, 1, 1 \right\rbrace, \, p = 1$",
-              r"$\Xi'' = \left\lbrace 0, 0, 0, \frac{1}{3}, \frac{1}{3}, \frac{2}{3}, \frac{2}{3}, 1, 1, 1 \right\rbrace, \, p = 2$")
+    titles = (r"$\Theta' = \left\lbrace 0, 0, \frac{1}{3}, \frac{2}{3}, 1, 1 \right\rbrace, \, p = 1$",
+              r"$\Theta'' = \left\lbrace 0, 0, 0, \frac{1}{3}, \frac{1}{3}, \frac{2}{3}, \frac{2}{3}, 1, 1, 1 \right\rbrace, \, p = 2$")
 
     method = (r'$h$-refinement \\ (knot insertion)',
               r'$p$-refinement \\ (order elevation)')
@@ -587,8 +587,8 @@ def figure_10b(**kwargs):
         basis.attach_basis_functions(ax)
 
         title_size = 10
-        ax.set_ylabel(r'$N_{i, \,p}\left(\xi\right)$', fontsize = title_size)
-        ax.set_xlabel(r'$\xi$', fontsize = title_size)
+        ax.set_ylabel(r'$N_{i, \,p}\left(\chi\right)$', fontsize = title_size)
+        ax.set_xlabel(r'$\chi$', fontsize = title_size)
         ax.set_title(title, fontsize = title_size)
         ax.set_xlim(0, 1.0)
         ax.set_ylim(0, 1.0)
@@ -624,8 +624,8 @@ def figure_10c(**kwargs):
     basis_lower = BSplineBasis([0, 0, 0, 1 / 3, 2 / 3, 1, 1, 1], polynomial_order = 2)
     bases = (basis_upper, basis_lower)
 
-    titles = (r"$\Xi' = \left\lbrace 0, 0, 0, 1, 1, 1 \right\rbrace, \, p = 2$",
-              r"$\Xi'' = \left\lbrace 0, 0, 0, \frac{1}{3}, \frac{2}{3}, 1, 1, 1 \right\rbrace, \, p = 2$")
+    titles = (r"$\Theta' = \left\lbrace 0, 0, 0, 1, 1, 1 \right\rbrace, \, p = 2$",
+              r"$\Theta'' = \left\lbrace 0, 0, 0, \frac{1}{3}, \frac{2}{3}, 1, 1, 1 \right\rbrace, \, p = 2$")
 
     method = (r'$p$-refinement \\ (order elevation)',
               r'$h$-refinement \\ (knot insertion)')
@@ -634,8 +634,8 @@ def figure_10c(**kwargs):
         basis.attach_basis_functions(ax)
 
         title_size = 10
-        ax.set_ylabel(r'$N_{i, \,p}\left(\xi\right)$', fontsize = title_size)
-        ax.set_xlabel(r'$\xi$', fontsize = title_size)
+        ax.set_ylabel(r'$N_{i, \,p}\left(\chi\right)$', fontsize = title_size)
+        ax.set_xlabel(r'$\chi$', fontsize = title_size)
         ax.set_title(title, fontsize = title_size)
         ax.set_xlim(0, 1.0)
         ax.set_ylim(0, 1.0)

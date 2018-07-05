@@ -7,15 +7,6 @@ import multiprocessing as mp
 import numpy as np
 import matplotlib as mpl
 
-mpl.use('Agg')
-
-
-#
-# mpl_rcParams_update = {
-#     'font.family': 'serif',
-#     'mathtext.fontset': 'cm',
-#     'mathtext.rm': 'serif',
-# }
 
 golden_ratio = (np.sqrt(5.0) - 1.0) / 2.0
 
@@ -41,7 +32,7 @@ def figsize(scale, fig_width_pts = 498.66258, aspect_ratio = golden_ratio):
 pgf_with_latex = {  # setup matplotlib to use latex for output
     "pgf.texsystem": "pdflatex",  # change this if using xetex or lautex
     "text.usetex": True,  # use LaTeX to write all text
-    "font.family": "serif",
+    # "font.family": "serif",
     "font.serif": [],  # blank entries should cause plots to inherit fonts from the document
     "font.sans-serif": [],
     "font.monospace": [],
